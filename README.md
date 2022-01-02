@@ -94,7 +94,7 @@ var metadata = {
 Call the `document` method with the aforementioned metadata object detailing your book.
 
 ```javascript
-var epub = nodepub.document(metadata);
+var epub = new NodepubLite(metadata);
 ```
 
 You also have the option to generate your own contents page. Full details on this are shown further down the page.
