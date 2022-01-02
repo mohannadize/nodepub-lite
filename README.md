@@ -26,7 +26,7 @@ It's on npm at [https://www.npmjs.com/package/nodepub-lite](https://www.npmjs.co
 Add it as with any other module:
 
 ```sh
-npm i nodepub
+npm i nodepub-lite
 ```
 
 Then import it for use:
@@ -49,7 +49,7 @@ var metadata = {
   cover: {
     name: "Cover.jpeg",
     type: "image/jpeg",
-    data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // can be blob or dataURI
+    data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // Blob or DataURI
   },
   title: "Unnamed Document",
   series: "My Series",
@@ -70,7 +70,7 @@ var metadata = {
     {
       name: "./images/1.jpeg",
       type: "image/jpeg",
-      data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // can be blob or dataURI
+      data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // Blob or DataURI
     },
   ],
 };
@@ -87,7 +87,7 @@ var metadata = {
 - The `language` is the short _ISO_ language name (`en`, `fr`, `de` etc)
 - The `showContents` option (default is `true`) lets you suppress the contents page
 - The `images` array is where you refer to all images used inside the book. Every image should be referenced as an object with three _keys_.
-  - `name` file name as refenced in the document html, Ex: if you referenced it as `<img src="../images/hat.png" />` so `name` should be `images/hat.png`.
+  - `name` file name as refenced in the document html, Ex: `name: "hat.png"` should be referenced in your html as `<img src="../images/hat.png" />`.
   - `type` mime type of the image.
   - `data` image as _blob_ or _base64 dataURI_.
 

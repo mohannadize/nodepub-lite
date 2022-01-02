@@ -1,6 +1,6 @@
 {
   "name": "nodepub-lite",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "This is a fork of the nodepub package that provides an alternative which runs in the browser",
   "main": "dist/nodepub-lite.js",
   "scripts": {
