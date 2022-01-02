@@ -1,12 +1,11 @@
 {
   "name": "nodepub-lite",
   "version": "1.0.0",
-  "description": "This is a fork of the nodepub library that provides an alternative that runs in the browser",
+  "description": "This is a fork of the nodepub package that provides an alternative which runs in the browser",
   "main": "dist/nodepub-lite.js",
   "scripts": {
     "start": "webpack --watch --mode=development",
     "build": "webpack --mode=production",
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
