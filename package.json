@@ -1,6 +1,6 @@
 {
   "name": "nodepub-lite",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This is a fork of the nodepub package that provides an alternative which runs in the browser",
   "main": "dist/nodepub-lite.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/mohannadize/nodepub-lite/issues"
   },
   "homepage": "https://github.com/mohannadize/nodepub-lite#readme",
-  "dependencies": {
+  "devDependencies": {
     "file-saver": "^2.0.5",
     "jszip": "^3.7.1",
     "webpack": "^5.65.0",
