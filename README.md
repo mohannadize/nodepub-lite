@@ -170,7 +170,7 @@ var makeContentsPage = (links) => {
   });
   return contents;
 };
-var epub = nodepub.document(metadata, makeContentsPage);
+var epub = new NodepubLite(metadata, makeContentsPage);
 ```
 
 The `links` array which is passed to your callback function consists of objects with the following properties:
@@ -188,9 +188,7 @@ The `example.js` mentioned in the next section shows this in action.
 Note that NodepubLite is _asynchronous_, actionable using `async`/`await`.
 
 ```javascript
-
-// This will generate an epub file which will start downloading in the browser window.
-const promise = epub
-  .createJSZip("filename-without-extention")
-  .catch(console.error);
+// This will generate an epub file `example.epub`
+// that will start downloading inside the browser window.
+const promise = epub.createEpub("example").catch(console.error);
 ```

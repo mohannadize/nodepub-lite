@@ -217,7 +217,7 @@ export default class NodepubLite {
     return syncFiles;
   }
 
-  async createJSZip(epubname = "ebook") {
+  async createEpub(epubname = "ebook") {
     const files = await this.getFilesForEPUB();
 
     // Start creating the zip.
