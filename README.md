@@ -18,7 +18,6 @@ NodepubLite is a Node module which can be used to create EPUB 2 documents.
 - Front matter before the contents page
 - Exclude sections from auto contents page and metadata-based navigation
 - OEBPS and other 'expected' subfolders within the EPUB
-- Development is done against Node v15.6.0 since v3.0.0 (February 2021). Node v10.3 or later should work fine.
 
 ## Installing NodepubLite
 
@@ -47,9 +46,9 @@ Here's some sample metadata:
 var metadata = {
   id: "278-123456789",
   cover: {
-    name: "Cover.jpeg",
-    type: "image/jpeg",
-    data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // Blob or DataURI
+    name: "Cover.png",
+    type: "image/png",
+    data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", // Blob or DataURI
   },
   title: "Unnamed Document",
   series: "My Series",
@@ -68,9 +67,9 @@ var metadata = {
   source: "http://www.kcartlidge.com",
   images: [
     {
-      name: "./images/1.jpeg",
-      type: "image/jpeg",
-      data: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", // Blob or DataURI
+      name: "./images/1.png",
+      type: "image/png",
+      data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", // Blob or DataURI
     },
   ],
 };

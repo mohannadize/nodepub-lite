@@ -4,9 +4,42 @@ import markupFiles from "./constituents/markup";
 import * as utils from "./utils";
 import { saveAs } from "file-saver";
 
-// Construct a new document
+/**
+ * @typedef {Object} Image
+ * @property {String} name Image Name
+ * @property {String} type Image Mime Type
+ * @property {(DataURI|Blob)} data Image Data
+ *
+ */
+
+/**
+ * @module NodepubLite class
+ */
 
 export default class NodepubLite {
+  /**
+   * Construct a new document
+   * @param {object} metadata
+   * @property {string} metadata.id - Id of the ebook
+   * @property {Image} metadata.cover - Cover Image
+   * @property {string} metadata.title - Title
+   * @property {string} metadata.author - Author
+   * @property {string} metadata.genre - he main subject in the final EPUB
+   * @property {string} [metadata.series] - Series
+   * @property {number} [metadata.sequence] - Number in the sequence of the series
+   * @property {string} [metadata.tags] - also become subjects in the final EPUB
+   * @property {string} [metadata.copyright] - Copy
+   * @property {string} [metadata.publisher] - Publisher
+   * @property {string} [metadata.published] - Publish date year-month-day format
+   * @property {string} [metadata.language] - The short ISO language name
+   * @property {string} [metadata.description] - Book description
+   * @property {boolean} [metadata.showContents] - Show table of contents
+   * @property {string} [metadata.contents] - Book description
+   * @property {string} [metadata.source] - Book description
+   * @property {Image[]} [metadata.images] - Book description
+   *
+   * @param {Function} generateContentsCallback
+   */
   constructor(metadata, generateContentsCallback) {
     this.CSS = "";
     this.sections = [];
@@ -43,11 +76,18 @@ export default class NodepubLite {
     }
   }
 
-  // Add a new section entry (usually a chapter) with the given title and
-  // (HTML) body content. Optionally excludes it from the contents page.
-  // If it is Front Matter then it will appear before the contents page.
-  // The overrideFilename is optional and refers to the name used inside the epub.
-  // by default the filenames are auto-numbered. No extention should be given.
+  /**
+   * Add a new section entry (usually a chapter) with the given title and
+   * (HTML) body content. Optionally excludes it from the contents page.
+   * If it is Front Matter then it will appear before the contents page.
+   * The overrideFilename is optional and refers to the name used inside the epub.
+   * by default the filenames are auto-numbered. No extention should be given.
+   * @param {string} title - Table of contents entry
+   * @param {string} content  - HTML content of the section
+   * @param {boolean} excludeFromContents - Hide from contents/navigation
+   * @param {boolean} isFrontMatter - Places before any contents page
+   * @param {string} overrideFilename - Section filename inside the EPUB
+   */
   addSection(
     title,
     content,
@@ -74,18 +114,26 @@ export default class NodepubLite {
     });
   }
 
-  // Add a CSS file to the EPUB. This will be shared by all sections.
+  /**
+   * Add a CSS file to the EPUB. This will be shared by all sections.
+   * @param {string} content - CSS to be inserted into the stylesheet
+   */
   addCSS(content) {
     this.CSS = content;
   }
 
-  // Gets the number of sections added so far.
+  /**
+   * @returns {number} number of sections added so far.
+   */
   getSectionCount() {
     return this.sections.length;
   }
 
-  // Gets the files needed for the EPUB, as an array of objects.
-  // Note that 'compress:false' MUST be respected for valid EPUB files.
+  /**
+   * Gets the files needed for the EPUB, as an array of objects.
+   * Note that 'compression:"STORE"' MUST be respected for valid EPUB files.
+   * @returns {array} files to be archived
+   */
   async getFilesForEPUB() {
     const syncFiles = [];
 
@@ -217,37 +265,37 @@ export default class NodepubLite {
     return syncFiles;
   }
 
+  /**
+   * Generates a new epub document and starts downloading in the browser.
+   * @example
+   * // Generates a book called "book-1.epub" and starts downloading
+   * instance.createEpub("book-1");
+   * @param {string} [epubname=ebook] - The epub file name to be used.
+   * @returns {Promise} Resolves if the book has been bundled successfully
+
+   */
   async createEpub(epubname = "ebook") {
     const files = await this.getFilesForEPUB();
 
     // Start creating the zip.
     const archive = new JSZip();
 
-    await new Promise((resolveWrite) => {
-      // Write the file contents.
-      files.forEach((file) => {
-        const content = utils.isDataURI(file.content)
-          ? utils.dataURItoBlob(file.content)
-          : file.content;
+    files.forEach((file) => {
+      const content = utils.isDataURI(file.content)
+        ? utils.dataURItoBlob(file.content)
+        : file.content;
 
-        if (file.folder.length > 0) {
-          archive.file(
-            `${file.folder}/${file.name}`,
-            content,
-            file.options
-          );
-        } else {
-          archive.file(file.name, content, file.options);
-        }
-      });
-
-      resolveWrite();
+      if (file.folder.length > 0) {
+        archive.file(`${file.folder}/${file.name}`, content, file.options);
+      } else {
+        archive.file(file.name, content, file.options);
+      }
     });
 
-    archive
+    return archive
       .generateAsync({ type: "blob", mimeType: structuralFiles.getMimetype() })
       .then(function (blob) {
-        saveAs(blob, `${epubname}.epub`);
+        return saveAs(blob, `${epubname}.epub`);
       });
   }
 }
