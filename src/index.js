@@ -18,7 +18,7 @@ import { saveAs } from "file-saver";
  * @property {Image} cover - Cover Image
  * @property {string} title - Title
  * @property {string} author - Author
- * @property {string} genre - Subject of the EPUB
+ * @property {string} [genre] - Subject of the EPUB
  * @property {string} [series] - Series
  * @property {number} [sequence] - Number in the sequence of the series
  * @property {string} [tags] - becomes subjects in the final EPUB
