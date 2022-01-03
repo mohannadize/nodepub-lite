@@ -6,11 +6,7 @@ const tagReplace = (original, tag, value) => {
 
 // Do all in-line replacements needed.
 const replacements = (document, original) => {
-  const d = new Date();
-  const modified = `${("0" + d.getDate()).slice(-2)}-${(
-    "0" +
-    (d.getMonth() + 1)
-  ).slice(-2)}-${d.getFullYear()}`;
+  const modified = new Date().toISOString().slice(0, 10);
   let result = original;
   result = tagReplace(result, "EOL", "\n");
   result = tagReplace(result, "COVER", document.metadata.cover);

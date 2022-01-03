@@ -1,5 +1,6 @@
 /* eslint-disable no-plusplus */
 const replacements = require('./replacements');
+const {isRTLLanguage} = require('../utils');
 
 const structural = {
 
@@ -21,6 +22,7 @@ const structural = {
   // Provide the contents of the OPF (spine) file.
   getOPF: (document) => {
     const coverImage = document.coverImage;
+    const progressionDirection = isRTLLanguage(document.metadata.language) ? "rtl" : "auto";
     let i;
     let result = '';
     result += "<?xml version='1.0' encoding='utf-8'?>[[EOL]]";
@@ -94,7 +96,7 @@ const structural = {
 
     result += '  </manifest>[[EOL]]';
 
-    result += "  <spine toc='navigation'>[[EOL]]";
+    result += `  <spine toc='navigation' page-progression-direction='${progressionDirection}'>[[EOL]]`;
     result += "    <itemref idref='cover' linear='yes' />[[EOL]]";
 
     for (i = 1; i <= document.sections.length; i += 1) {

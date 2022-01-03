@@ -18,6 +18,7 @@ NodepubLite is a Node module which can be used to create EPUB 2 documents.
 - Front matter before the contents page
 - Exclude sections from auto contents page and metadata-based navigation
 - OEBPS and other 'expected' subfolders within the EPUB
+- Support for Most Used Right To Left Languages with `page-progression-direction='rtl'`
 
 ## Installing NodepubLite
 

@@ -1,5 +1,5 @@
-// const path = require('path');
 const replacements = require('./replacements');
+const {isRTLLanguage} = require("../utils")
 
 const markup = {
 
@@ -69,7 +69,17 @@ const markup = {
   },
 
   // Provide the contents of the CSS file.
-  getCSS: (document) => replacements(document, replacements(document, document.CSS)),
+  getCSS: (document) => {
+    let baseCSS = `@page{margin:10px}a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,del,details,dfn,div,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,mark,menu,nav,object,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,var,video{margin:0;padding:0;border:0;font-size:100%;vertical-align:baseline}table{border-collapse:collapse;border-spacing:0}dd,dl,dt,li,ol,ul{margin:0;padding:0;border:0;font-size:100%;vertical-align:baseline}body{text-align:justify;line-height:120%}h1{text-indent:0;text-align:center;margin:100px 0 0 0;font-size:2em;font-weight:700;page-break-before:always;line-height:150%}h2{text-indent:0;text-align:center;margin:50px 0 0 0;font-size:1.5em;font-weight:700;page-break-before:always;line-height:135%}h3{text-indent:0;text-align:left;font-size:1.4em;font-weight:700}h4{text-indent:0;text-align:left;font-size:1.2em;font-weight:700}h5{text-indent:0;text-align:left;font-size:1.1em;font-weight:700}h6{text-indent:0;text-align:left;font-size:1em;font-weight:700}h1,h2,h3,h4,h5,h6{-webkit-hyphens:none!important;hyphens:none;page-break-after:avoid;page-break-inside:avoid}p{text-indent:1.25em;margin:0;widows:2;orphans:2}p.centered{text-indent:0;margin:1em 0 0 0;text-align:center}p.centeredbreak{text-indent:0;margin:1em 0 1em 0;text-align:center}p.texttop{margin:1.5em 0 0 0;text-indent:0}p.clearit{clear:both}p.toctext{margin:0 0 0 1.5em;text-indent:0}p.toctext2{margin:0 0 0 2.5em;text-indent:0}ul{margin:1em 0 0 2em;text-align:left}ol{margin:1em 0 0 2em;text-align:left}span.i{font-style:italic}span.b{font-weight:700}span.u{text-decoration:underline}span.st{text-decoration:line-through}span.ib{font-style:italic;font-weight:700}span.iu{font-style:italic;text-decoration:underline}span.bu{font-weight:700;text-decoration:underline}span.ibu{font-style:italic;font-weight:700;text-decoration:underline}span.ipadcenterfix{text-align:center}img{max-width:100%}table{margin:1em auto}td,th,tr{margin:0;padding:2px;border:1px solid #000;font-size:100%;vertical-align:baseline}.footnote{vertical-align:super;font-size:.75em;text-decoration:none}span.dropcap{font-size:300%;font-weight:700;height:1em;float:left;margin:.3em .125em -.4em .1em}div.pullquote{margin:2em 2em 0 2em;text-align:left}div.pullquote p{font-weight:700;font-style:italic}div.pullquote hr{width:100%;margin:0;height:3px;color:#2e8de0;background-color:#2e8de0;border:0}div.blockquote{margin:1em 1.5em 0 1.5em;text-align:left;font-size:.9em}`
+    if (isRTLLanguage(document.metadata.language)) baseCSS += `
+    body, html {
+      text-align: right;
+      direction: rtl;
+    }
+    `;
+    baseCSS += replacements(document, replacements(document, document.CSS));
+    return baseCSS;
+  },
 
   // Provide the contents of a single section's HTML.
   getSection: (document, sectionNumber) => {
