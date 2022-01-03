@@ -343,7 +343,7 @@ export default class NodepubLite {
     return archive
       .generateAsync({ type: "blob", mimeType: structuralFiles.getMimetype() })
       .then(function (blob) {
-        return saveAs(blob, `${fileNameWithoutExtension || this.title}.epub`);
+        return saveAs(blob, `${fileNameWithoutExtension || this.metadata.title}.epub`);
       });
   }
 }
