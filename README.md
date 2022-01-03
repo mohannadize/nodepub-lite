@@ -189,5 +189,5 @@ Note that NodepubLite is _asynchronous_, actionable using `async`/`await`.
 ```javascript
 // This will generate an epub file `example.epub`
 // that will start downloading inside the browser window.
-const promise = epub.createEpub("example").catch(console.error);
+const promise = epub.createEPUB("example").catch(console.error);
 ```

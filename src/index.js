@@ -6,9 +6,19 @@ import { saveAs } from "file-saver";
 
 /**
  * @typedef {Object} Image
- * @property {String} name Image Name
- * @property {String} type Image Mime Type
+ * @property {string} name Image Name
+ * @property {string} type Image Mime Type
  * @property {(DataURI|Blob)} data Image Data
+ *
+ */
+
+/**
+ * @typedef {Function} ContentPageGenerator
+ * @param {array} items an array with of the epub items
+ * @property {string} items[].title - the title of the section being linked to
+ * @property {string} items[].link -  the relative `href` within the EPUB
+ * @property {string} items[].itemType -  one of 3 types, those being *front* for front matter, *contents* for the contents page, and *main* for the remaining sections. You can use this to omit front matter from the contents page if required
+ * @returns {string} type Image Mime Type
  *
  */
 
@@ -19,26 +29,64 @@ import { saveAs } from "file-saver";
 export default class NodepubLite {
   /**
    * Construct a new document
+   * @example <caption>Returns a new document instance</caption>
+   * const metadata = {
+   *    id: "1",
+   *    title: "Example Book",
+   *    cover: {
+   *      name: "Cover.png",
+   *      type: "image/png",
+   *      data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+   *    },
+   *    author: "Author",
+   * };
+   * 
+   * const instance = new NodepubLite(metadata)
+   * 
+   * @example <caption>Returns a new document instance with a custom contents page</caption>
+   * const metadata = {
+   *    id: "1",
+   *    title: "Example Book",
+   *    cover: {
+   *      name: "Cover.png",
+   *      type: "image/png",
+   *      data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+   *    },
+   *    author: "Author",
+   * };
+   * 
+   * const makeContentsPage = (links) => {
+   *   let contents = "<h1>Chapters</h1>";
+   *   links.forEach((link) => {
+   *     if (link.itemType !== "contents") {
+   *       contents += "<a href='" + link.link + "'>" + link.title + "</a><br />";
+   *     }
+   *   });
+   *   return contents;
+   * };
+   * 
+   * const instance = new NodepubLite(metadata, makeContentsPage)
    * @param {object} metadata
    * @property {string} metadata.id - Id of the ebook
    * @property {Image} metadata.cover - Cover Image
    * @property {string} metadata.title - Title
    * @property {string} metadata.author - Author
-   * @property {string} metadata.genre - he main subject in the final EPUB
+   * @property {string} metadata.genre - Subject of the EPUB
    * @property {string} [metadata.series] - Series
    * @property {number} [metadata.sequence] - Number in the sequence of the series
-   * @property {string} [metadata.tags] - also become subjects in the final EPUB
+   * @property {string} [metadata.tags] - becomes subjects in the final EPUB
    * @property {string} [metadata.copyright] - Copy
    * @property {string} [metadata.publisher] - Publisher
    * @property {string} [metadata.published] - Publish date year-month-day format
    * @property {string} [metadata.language] - The short ISO language name
    * @property {string} [metadata.description] - Book description
    * @property {boolean} [metadata.showContents] - Show table of contents
-   * @property {string} [metadata.contents] - Book description
-   * @property {string} [metadata.source] - Book description
-   * @property {Image[]} [metadata.images] - Book description
+   * @property {string} [metadata.contents] - Table of contents page title
+   * @property {string} [metadata.source] - Book Source URL
+   * @property {Image[]} [metadata.images] - An array of the images used in the epub
    *
-   * @param {Function} generateContentsCallback
+   * @param {ContentPageGenerator} [generateContentsCallback] - a function which is called when the contents 
+   * page is being constructed.
    */
   constructor(metadata, generateContentsCallback) {
     this.CSS = "";
@@ -84,9 +132,9 @@ export default class NodepubLite {
    * by default the filenames are auto-numbered. No extention should be given.
    * @param {string} title - Table of contents entry
    * @param {string} content  - HTML content of the section
-   * @param {boolean} excludeFromContents - Hide from contents/navigation
-   * @param {boolean} isFrontMatter - Places before any contents page
-   * @param {string} overrideFilename - Section filename inside the EPUB
+   * @param {boolean} [excludeFromContents] - Hide from contents/navigation
+   * @param {boolean} [isFrontMatter] - Places before any contents page
+   * @param {string} [overrideFilename] - Section filename inside the EPUB
    */
   addSection(
     title,
@@ -269,12 +317,12 @@ export default class NodepubLite {
    * Generates a new epub document and starts downloading in the browser.
    * @example
    * // Generates a book called "book-1.epub" and starts downloading
-   * instance.createEpub("book-1");
-   * @param {string} [epubname=ebook] - The epub file name to be used.
+   * instance.createEPUB("book-1");
+   * @param {string} [epubname=this.title] - The epub file name to be used.
    * @returns {Promise} Resolves if the book has been bundled successfully
 
    */
-  async createEpub(epubname = "ebook") {
+  async createEPUB(epubname = this.title) {
     const files = await this.getFilesForEPUB();
 
     // Start creating the zip.
