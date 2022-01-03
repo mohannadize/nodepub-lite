@@ -13,6 +13,28 @@ import { saveAs } from "file-saver";
  */
 
 /**
+ * @typedef {Object} MetaData
+ * @property {string} id - Id of the ebook
+ * @property {Image} cover - Cover Image
+ * @property {string} title - Title
+ * @property {string} author - Author
+ * @property {string} genre - Subject of the EPUB
+ * @property {string} [series] - Series
+ * @property {number} [sequence] - Number in the sequence of the series
+ * @property {string} [tags] - becomes subjects in the final EPUB
+ * @property {string} [copyright] - Copy
+ * @property {string} [publisher] - Publisher
+ * @property {string} [published] - Publish date year-month-day format
+ * @property {string} [language] - The short ISO language name
+ * @property {string} [description] - Book description
+ * @property {boolean} [showContents] - Show table of contents
+ * @property {string} [contents] - Table of contents page title
+ * @property {string} [source] - Book Source URL
+ * @property {Image[]} [images] - An array of the images used in the epub
+ *
+ */
+
+/**
  * @typedef {Function} ContentPageGenerator
  * @param {array} items an array with of the epub items
  * @property {string} items[].title - the title of the section being linked to
@@ -40,9 +62,9 @@ export default class NodepubLite {
    *    },
    *    author: "Author",
    * };
-   * 
+   *
    * const instance = new NodepubLite(metadata)
-   * 
+   *
    * @example <caption>Returns a new document instance with a custom contents page</caption>
    * const metadata = {
    *    id: "1",
@@ -54,7 +76,7 @@ export default class NodepubLite {
    *    },
    *    author: "Author",
    * };
-   * 
+   *
    * const makeContentsPage = (links) => {
    *   let contents = "<h1>Chapters</h1>";
    *   links.forEach((link) => {
@@ -64,28 +86,10 @@ export default class NodepubLite {
    *   });
    *   return contents;
    * };
-   * 
-   * const instance = new NodepubLite(metadata, makeContentsPage)
-   * @param {object} metadata
-   * @property {string} metadata.id - Id of the ebook
-   * @property {Image} metadata.cover - Cover Image
-   * @property {string} metadata.title - Title
-   * @property {string} metadata.author - Author
-   * @property {string} metadata.genre - Subject of the EPUB
-   * @property {string} [metadata.series] - Series
-   * @property {number} [metadata.sequence] - Number in the sequence of the series
-   * @property {string} [metadata.tags] - becomes subjects in the final EPUB
-   * @property {string} [metadata.copyright] - Copy
-   * @property {string} [metadata.publisher] - Publisher
-   * @property {string} [metadata.published] - Publish date year-month-day format
-   * @property {string} [metadata.language] - The short ISO language name
-   * @property {string} [metadata.description] - Book description
-   * @property {boolean} [metadata.showContents] - Show table of contents
-   * @property {string} [metadata.contents] - Table of contents page title
-   * @property {string} [metadata.source] - Book Source URL
-   * @property {Image[]} [metadata.images] - An array of the images used in the epub
    *
-   * @param {ContentPageGenerator} [generateContentsCallback] - a function which is called when the contents 
+   * const instance = new NodepubLite(metadata, makeContentsPage)
+   * @param {MetaData} metadata
+   * @param {ContentPageGenerator} [generateContentsCallback] - a function which is called when the contents
    * page is being constructed.
    */
   constructor(metadata, generateContentsCallback) {
@@ -324,7 +328,7 @@ export default class NodepubLite {
    */
   async createEPUB(fileNameWithoutExtension) {
     const files = await this.getFilesForEPUB();
-    const title = this.metadata.title
+    const title = this.metadata.title;
 
     // Start creating the zip.
     const archive = new JSZip();
