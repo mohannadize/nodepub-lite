@@ -38,5 +38,5 @@ export function isRTLLanguage(ISOCode) {
     ur: "Urdu",
     yi: "Yiddish",
   };
-  return rtlLanguageList.hasOwnProperty(ISOCode.toLowerString());
+  return rtlLanguageList.hasOwnProperty(ISOCode.toLowerCase());
 }
