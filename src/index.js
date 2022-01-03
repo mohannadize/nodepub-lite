@@ -318,11 +318,11 @@ export default class NodepubLite {
    * @example
    * // Generates a book called "book-1.epub" and starts downloading
    * instance.createEPUB("book-1");
-   * @param {string} [epubname=this.title] - The epub file name to be used.
+   * @param {string} [fileNameWithoutExtension=this.title] - The epub file name to be used.
    * @returns {Promise} Resolves if the book has been bundled successfully
 
    */
-  async createEPUB(epubname = this.title) {
+  async createEPUB(fileNameWithoutExtension) {
     const files = await this.getFilesForEPUB();
 
     // Start creating the zip.
@@ -343,7 +343,7 @@ export default class NodepubLite {
     return archive
       .generateAsync({ type: "blob", mimeType: structuralFiles.getMimetype() })
       .then(function (blob) {
-        return saveAs(blob, `${epubname}.epub`);
+        return saveAs(blob, `${fileNameWithoutExtension || this.title}.epub`);
       });
   }
 }
