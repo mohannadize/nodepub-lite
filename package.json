@@ -1,6 +1,6 @@
 {
   "name": "nodepub-lite",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "This is a fork of (nodepub). Create valid EPUB (v2) ebooks with metadata, contents and cover image inside your browser.",
   "main": "dist/nodepub-lite.js",
   "scripts": {
