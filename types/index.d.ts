@@ -1,4 +1,4 @@
-declare module "nodepub-lite" {
+declare namespace NodepubLite {
   interface FileEntry {
     name: string;
     folder: string;
@@ -22,7 +22,7 @@ declare module "nodepub-lite" {
     title: string;
     author: string;
     cover: ImageObject;
-    language: string;
+    language?: string;
     series?: string;
     sequence?: number;
     genre?: string;
@@ -64,6 +64,7 @@ declare module "nodepub-lite" {
       fileNameWithoutExtenstion?: string
     ): Promise<PromiseRejectedResult | PromiseFulfilledResult<void>>;
   }
-
-  export default NodepubLite;
 }
+
+export as namespace NodepubLite;
+export = NodepubLite;
