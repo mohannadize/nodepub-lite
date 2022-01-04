@@ -1,10 +1,12 @@
-export function isDataURI(s) {
+const helpers = {};
+
+helpers.isDataURI = (s) => {
   const regex =
     /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i;
   return typeof s === "string" && !!s.match(regex);
-}
+};
 
-export function dataURItoBlob(dataURI) {
+helpers.dataURItoBlob = (dataURI) => {
   // convert base64 to raw binary data held in a string
   var byteString = atob(dataURI.split(",")[1]);
 
@@ -21,9 +23,9 @@ export function dataURItoBlob(dataURI) {
   var dataView = new DataView(arrayBuffer);
   var blob = new Blob([dataView], { type: mimeString });
   return blob;
-}
+};
 
-export function isRTLLanguage(ISOCode) {
+helpers.isRTLLanguage = (ISOCode) => {
   const rtlLanguageList = {
     ar: "Arabic",
     arc: "Aramaic",
@@ -39,4 +41,6 @@ export function isRTLLanguage(ISOCode) {
     yi: "Yiddish",
   };
   return rtlLanguageList.hasOwnProperty(ISOCode.toLowerCase());
-}
+};
+
+module.exports = helpers;

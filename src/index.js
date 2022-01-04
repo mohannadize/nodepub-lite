@@ -1,8 +1,8 @@
-import JSZip from "jszip";
-import structuralFiles from "./constituents/structural";
-import markupFiles from "./constituents/markup";
-import * as utils from "./utils";
-import { saveAs } from "file-saver";
+const JSZip = require("jszip");
+const structuralFiles = require("./constituents/structural");
+const markupFiles = require("./constituents/markup");
+const utils = require("./utils");
+const { saveAs } = require("file-saver");
 
 /**
  * @typedef {Object} Image
@@ -40,7 +40,7 @@ import { saveAs } from "file-saver";
  * @property {string} items[].title - the title of the section being linked to
  * @property {string} items[].link -  the relative `href` within the EPUB
  * @property {string} items[].itemType -  one of 3 types, those being *front* for front matter, *contents* for the contents page, and *main* for the remaining sections. You can use this to omit front matter from the contents page if required
- * @returns {string} type Image Mime Type
+ * @returns {string} 
  *
  */
 
@@ -48,7 +48,7 @@ import { saveAs } from "file-saver";
  * @module NodepubLite class
  */
 
-export default class NodepubLite {
+class NodepubLite {
   /**
    * Construct a new document
    * @example <caption>Returns a new document instance</caption>
@@ -96,7 +96,10 @@ export default class NodepubLite {
     this.CSS = "";
     this.sections = [];
     this.images = [];
-    this.metadata = metadata;
+    this.metadata = {
+      language: "en",
+      ...metadata,
+    };
     this.generateContentsCallback = generateContentsCallback;
     this.showContents = true;
     this.filesForTOC = [];
@@ -171,7 +174,7 @@ export default class NodepubLite {
    * @param {string} content - CSS to be inserted into the stylesheet
    */
   addCSS(content) {
-    this.CSS = content;
+    this.CSS += content;
   }
 
   /**
@@ -352,3 +355,5 @@ export default class NodepubLite {
       });
   }
 }
+
+module.exports = NodepubLite;
