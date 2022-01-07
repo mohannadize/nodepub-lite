@@ -47,8 +47,7 @@ Here's some sample metadata:
 var metadata = {
   id: "278-123456789",
   cover: {
-    name: "Cover.png",
-    type: "image/png",
+    name: "cover.png",
     data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", // Blob or DataURI
   },
   title: "Unnamed Document",
@@ -68,8 +67,7 @@ var metadata = {
   source: "http://www.kcartlidge.com",
   images: [
     {
-      name: "./images/1.png",
-      type: "image/png",
+      name: "image-1.png",
       data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", // Blob or DataURI
     },
   ],
@@ -77,8 +75,7 @@ var metadata = {
 ```
 
 - The `cover` should be an object that has three _keys_.
-  - `name` file name as refenced in the document html.
-  - `type` mime type of the image.
+  - `name` file name. [Optional]
   - `data` image as _blob_ or _base64 dataURI_.
 - The `series` and `sequence` are not recognised by many readers (the _Calibre_ properties are used)
 - The `genre` becomes the main subject in the final EPUB
@@ -87,8 +84,7 @@ var metadata = {
 - The `language` is the short _ISO_ language name (`en`, `fr`, `de` etc)
 - The `showContents` option (default is `true`) lets you suppress the contents page
 - The `images` array is where you refer to all images used inside the book. Every image should be referenced as an object with three _keys_.
-  - `name` file name as refenced in the document html, Ex: `name: "hat.png"` should be referenced in your html as `<img src="../images/hat.png" />`.
-  - `type` mime type of the image.
+  - `name` file name as refenced in the document html, Ex: `name: "image-1.png"` should be referenced in your html as `<img src="../images/image-1.png" />`.
   - `data` image as _blob_ or _base64 dataURI_.
 
 Call the `document` method with the aforementioned metadata object detailing your book.

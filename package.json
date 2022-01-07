@@ -1,6 +1,6 @@
 {
   "name": "nodepub-lite",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "This is a fork of (nodepub). Create valid EPUB (v2) ebooks with metadata, contents and cover image inside your browser.",
   "main": "src/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "javascript",
     "browser"
   ],
-  "types": "types/index.d.ts",
+  "types": "index.d.ts",
   "author": "Mohanad Hesham",
   "license": "MIT",
   "bugs": {

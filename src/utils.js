@@ -6,6 +6,27 @@ helpers.isDataURI = (s) => {
   return typeof s === "string" && !!s.match(regex);
 };
 
+helpers.getMimeType = (imageData) => {
+  if (typeof imageData === "string") {
+    let mimeType = imageData.split(",")[0].split(":")[1].split(";")[0];
+    return {
+      mimeType,
+    };
+  }
+  return imageData.type;
+};
+
+helpers.getExtension = (mimetype) => {
+  const extensions = {
+    "image/svg+xml": ".svg",
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/gif": ".gif",
+    "image/tiff": ".tiff",
+  };
+  return extensions[mimetype] || "";
+};
+
 helpers.dataURItoBlob = (dataURI) => {
   // convert base64 to raw binary data held in a string
   var byteString = atob(dataURI.split(",")[1]);

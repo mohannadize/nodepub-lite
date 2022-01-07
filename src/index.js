@@ -7,7 +7,6 @@ const { saveAs } = require("file-saver");
 /**
  * @typedef {Object} Image
  * @property {string} name Image Name
- * @property {string} type Image Mime Type
  * @property {(DataURI|Blob)} data Image Data
  *
  */
@@ -40,7 +39,7 @@ const { saveAs } = require("file-saver");
  * @property {string} items[].title - the title of the section being linked to
  * @property {string} items[].link -  the relative `href` within the EPUB
  * @property {string} items[].itemType -  one of 3 types, those being *front* for front matter, *contents* for the contents page, and *main* for the remaining sections. You can use this to omit front matter from the contents page if required
- * @returns {string} 
+ * @returns {string}
  *
  */
 
@@ -111,9 +110,12 @@ class NodepubLite {
     required.forEach((field) => {
       const prop = metadata[field];
       if (field === "cover") {
-        if (prop == null || typeof prop === "undefined" || !prop.name)
-          throw new Error(`Missing metadata: ${field}`);
-        this.coverImage = prop;
+        if (prop == null || typeof prop === "undefined" || !prop.data)
+          throw new Error(`Missing metadata: cover image`);
+        this.coverImage = {
+          name: `cover${utils.getExtension(utils.getMimeType(prop.data))}`,
+          ...prop,
+        };
       }
       if (
         prop == null ||
@@ -191,58 +193,47 @@ class NodepubLite {
    */
   async getFilesForEPUB() {
     const syncFiles = [];
+    const compressionOptions = {
+      STORE: {
+        compression: "STORE",
+      },
+      COMPRESS: {
+        compression: "DEFLATE",
+        compressionOptions: {
+          level: 7,
+        },
+      },
+    };
 
     // Required files.
     syncFiles.push({
       name: "mimetype",
       folder: "",
-      options: {
-        compression: "STORE",
-      },
+      options: compressionOptions.STORE,
       content: structuralFiles.getMimetype(),
     });
     syncFiles.push({
       name: "container.xml",
       folder: "META-INF",
-      options: {
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
-      },
+      options: compressionOptions.COMPRESS,
       content: structuralFiles.getContainer(this),
     });
     syncFiles.push({
       name: "ebook.opf",
       folder: "OEBPF",
-      options: {
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
-      },
+      options: compressionOptions.COMPRESS,
       content: structuralFiles.getOPF(this),
     });
     syncFiles.push({
       name: "navigation.ncx",
       folder: "OEBPF",
-      options: {
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
-      },
+      options: compressionOptions.COMPRESS,
       content: structuralFiles.getNCX(this),
     });
     syncFiles.push({
       name: "cover.xhtml",
       folder: "OEBPF",
-      options: {
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
-      },
+      options: compressionOptions.COMPRESS,
       content: markupFiles.getCover(this),
     });
 
@@ -250,12 +241,7 @@ class NodepubLite {
     syncFiles.push({
       name: "ebook.css",
       folder: "OEBPF/css",
-      options: {
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
-      },
+      options: compressionOptions.COMPRESS,
       content: markupFiles.getCSS(this),
     });
     for (let i = 1; i <= this.sections.length; i += 1) {
@@ -263,10 +249,7 @@ class NodepubLite {
       syncFiles.push({
         name: `${fname}`,
         folder: "OEBPF/content",
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 4,
-        },
+        options: compressionOptions.COMPRESS,
         content: markupFiles.getSection(this, i),
       });
     }
@@ -276,12 +259,7 @@ class NodepubLite {
       syncFiles.push({
         name: "toc.xhtml",
         folder: "OEBPF/content",
-        options: {
-          compression: "DEFLATE",
-          compressionOptions: {
-            level: 4,
-          },
-        },
+        options: compressionOptions.COMPRESS,
         content: markupFiles.getTOC(this),
       });
     }
@@ -291,12 +269,7 @@ class NodepubLite {
       syncFiles.push({
         name: this.coverImage.name,
         folder: "OEBPF/images",
-        options: {
-          compression: "DEFLATE",
-          compressionOptions: {
-            level: 4,
-          },
-        },
+        options: compressionOptions.COMPRESS,
         content: this.coverImage.data,
       });
 
@@ -305,12 +278,7 @@ class NodepubLite {
         syncFiles.push({
           name: image.name,
           folder: "OEBPF/images",
-          options: {
-            compression: "DEFLATE",
-            compressionOptions: {
-              level: 4,
-            },
-          },
+          options: compressionOptions.COMPRESS,
           content: image.data,
         });
       });
