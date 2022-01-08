@@ -9,9 +9,7 @@ helpers.isDataURI = (s) => {
 helpers.getMimeType = (imageData) => {
   if (typeof imageData === "string") {
     let mimeType = imageData.split(",")[0].split(":")[1].split(";")[0];
-    return {
-      mimeType,
-    };
+    return mimeType;
   }
   return imageData.type;
 };
