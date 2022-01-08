@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
 const replacements = require('./replacements');
-const {isRTLLanguage} = require('../utils');
+const {isRTLLanguage, getMimeType} = require('../utils');
 
 const structural = {
 
@@ -69,7 +69,7 @@ const structural = {
     result += "    <meta name='cover' content='cover-image'/>[[EOL]]";
     result += '  </metadata>[[EOL]]';
     result += '  <manifest>[[EOL]]';
-    result += `    <item id='cover-image' media-type='${coverImage.type}' href='images/${coverImage.name}'/>[[EOL]]`;
+    result += `    <item id='cover-image' media-type='${getMimetype(coverImage.data)}' href='images/${coverImage.name}'/>[[EOL]]`;
     result += "    <item id='cover' media-type='application/xhtml+xml' href='cover.xhtml'/>[[EOL]]";
     result += "    <item id='navigation' media-type='application/x-dtbncx+xml' href='navigation.ncx'/>[[EOL]]";
 

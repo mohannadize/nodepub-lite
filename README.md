@@ -188,3 +188,27 @@ Note that NodepubLite is _asynchronous_, actionable using `async`/`await`.
 // that will start downloading inside the browser window.
 const promise = epub.createEPUB("example").catch(console.error);
 ```
+
+## Substitutions within your book content
+
+A simple form of text substitution is supported. At any point in your section's content you may include placeholders like `[[COPYRIGHT]]`. When the EPUB is generated any such placeholders which match the *capitalised* name of a *metadata* entry are replaced with the corresponding metadata value.
+
+For example, you could have a "Thanks for Reading" page at the end of your book which has the following markup:
+
+``` html
+<p>Thanks for reading <strong>[[TITLE]]</strong> by <em>[[AUTHOR]]</em>.</p>
+```
+
+When the EPUB is produced and opened, if your metadata was set as per the book "The Hobbit" by "JRR Tolkien", then it will look like this:
+
+---
+
+Thanks for reading **The Hobbit** by *JRR Tolkien*.
+
+---
+
+This means you can re-use content across multiple books, or refer to the author/title/series/whatever at any point within the book without worrying about consistency or maintenance.
+
+## Reminder
+
+This is a utility module, not a user-facing one. In other words it is assumed that the caller has already validated the inputs. Only basic omission checks are performed.
