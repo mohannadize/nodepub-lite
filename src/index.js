@@ -301,8 +301,8 @@ class NodepubLite {
     this.sections.push({
       title,
       content,
-      excludeFromContents: excludeFromContents,
-      isFrontMatter: isFrontMatter,
+      excludeFromContents,
+      isFrontMatter,
       filename,
     });
     return true;

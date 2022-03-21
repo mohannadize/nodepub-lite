@@ -2,8 +2,8 @@ const { getMimeType, isRTLLanguage, getExtension } = require("./utils");
 const replacements = require("./replacements");
 
 const constituents = {
-  getMimetype: () => 'application/epub+zip',
-  
+  getMimetype: () => "application/epub+zip",
+
   getContainer: (document) => {
     let result = ``;
     result += `<?xml version="1.0" encoding='UTF-8' ?>[[EOL]]`;
@@ -105,18 +105,18 @@ const constituents = {
     navMap += `    </navPoint>[[EOL]]`;
 
     for (let i = 1; i <= document.sections.length; i += 1) {
-      if (!document.sections[i - 1].excludeFromContents) {
-        if (document.sections[i - 1].isFrontMatter) {
-          const fname = document.sections[i - 1].filename;
-          title = document.sections[i - 1].title;
+      const section = document.sections[i - 1];
+      if (!section.excludeFromContents) {
+        if (section.isFrontMatter) {
+          const { filename, title } = section;
           document.filesForTOC.push({
             title,
-            link: `${fname}`,
+            link: `${filename}`,
             itemType: "front",
           });
           navMap += `    <navPoint class='section' id='s${i}' playOrder='${playOrder++}'>[[EOL]]`;
           navMap += `        <navLabel><text>${title}</text></navLabel>[[EOL]]`;
-          navMap += `        <content src='content/${fname}'/>[[EOL]]`;
+          navMap += `        <content src='content/${filename}'/>[[EOL]]`;
           navMap += `    </navPoint>[[EOL]]`;
         }
       }
@@ -138,18 +138,18 @@ const constituents = {
     }
 
     for (let i = 1; i <= document.sections.length; i += 1) {
-      if (!document.sections[i - 1].excludeFromContents) {
-        if (!document.sections[i - 1].isFrontMatter) {
-          const fname = document.sections[i - 1].filename;
-          title = document.sections[i - 1].title;
+      const section = document.sections[i - 1];
+      if (!section.excludeFromContents) {
+        if (!section.isFrontMatter) {
+          const { filename, title } = section;
           document.filesForTOC.push({
             title,
-            link: `${fname}`,
+            link: `${filename}`,
             itemType: "main",
           });
           navMap += `    <navPoint class="chapter" id="s${i}" playOrder="${playOrder++}">[[EOL]]`;
           navMap += `        <navLabel><text>${title}</text></navLabel>[[EOL]]`;
-          navMap += `        <content src="content/${fname}" />[[EOL]]`;
+          navMap += `        <content src="content/${filename}" />[[EOL]]`;
           navMap += `    </navPoint>[[EOL]]`;
         }
       }
@@ -315,7 +315,6 @@ const constituents = {
     result += `        <link rel="stylesheet" type="text/css" href="../css/ebook.css" />[[EOL]]`;
     result += `    </head>[[EOL]]`;
     result += `    <body dir="${dir}">[[EOL]]`;
-    result += `        <h1>${title}</h1>[[EOL]]`;
     result += `        <div class="content">[[EOL]]`;
     result += `            ${content}[[EOL]]`;
     result += `        </div>[[EOL]]`;
