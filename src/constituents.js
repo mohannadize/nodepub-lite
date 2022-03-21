@@ -213,7 +213,9 @@ const constituents = {
     metadata += `    <dc:creator id="creator">[[AUTHOR]]</dc:creator>[[EOL]]`;
     metadata += `    <dc:language>[[LANGUAGE]]</dc:language>[[EOL]]`;
     metadata += `    <dc:publisher>[[PUBLISHER]]</dc:publisher>[[EOL]]`;
-    metadata += `    <dc:description>[[DESCRIPTION]]</dc:description>[[EOL]]`;
+    if (document.description) {
+      metadata += `    <dc:description>[[DESCRIPTION]]</dc:description>[[EOL]]`;
+    }
     metadata += `    <dc:date>[[MODIFIED]]</dc:date>[[EOL]]`;
     metadata += `    <dc:rights>Copyright &#x00A9; [[PUBLISHED]] by [[PUBLISHER]]</dc:rights>[[EOL]]`;
     if (document.genre) {
@@ -233,9 +235,9 @@ const constituents = {
 
     let manifest = ``;
     manifest += `<manifest>[[EOL]]`;
-    manifest += `    <item id="image_cover" href="images/cover${getExtension(
-      getMimeType(document.cover.data)
-    )}"  media-type="${getMimeType(document.cover.data)}" />[[EOL]]`;
+    manifest += `    <item id="image_cover" href="images/${
+      document.cover.name
+    }"  media-type="${getMimeType(document.cover.data)}" />[[EOL]]`;
     manifest += `    <item id='cover' media-type='application/xhtml+xml' href='cover.xhtml'/>[[EOL]]`;
     manifest += `    <item id="ncx" href="navigation.ncx" media-type="application/x-dtbncx+xml" />[[EOL]]`;
     if (document.showContents) {
