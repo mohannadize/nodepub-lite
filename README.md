@@ -4,7 +4,7 @@ This repository is a fork of [kcartlidge/nodepub](https://github.com/kcartlidge/
 
 ## About NodepubLite
 
-NodepubLite is a Node module which can be used to create EPUB 2 documents.
+NodepubLite is a Node module which can be used to create EPUB 3 documents.
 
 - Files pass the IDPF online validator
 - Files meet Sigil's preflight checks
@@ -17,7 +17,7 @@ NodepubLite is a Node module which can be used to create EPUB 2 documents.
 - Optionally generate your own contents page
 - Front matter before the contents page
 - Exclude sections from auto contents page and metadata-based navigation
-- OEBPS and other 'expected' subfolders within the EPUB
+- OEBPF and other 'expected' subfolders within the EPUB
 - Support for Most Used Right To Left Languages with `page-progression-direction='rtl'`
 
 ## Installing NodepubLite

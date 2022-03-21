@@ -1,7 +1,6 @@
 const JSZip = require("jszip");
-const structuralFiles = require("./constituents/structural");
-const markupFiles = require("./constituents/markup");
 const utils = require("./utils");
+const constituents = require("../src/constituents");
 const { saveAs } = require("file-saver");
 
 /**
@@ -30,6 +29,7 @@ const { saveAs } = require("file-saver");
  * @property {string} [contents] - Table of contents page title
  * @property {string} [source] - Book Source URL
  * @property {Image[]} [images] - An array of the images used in the epub
+ * @property {boolean} [isRTL] - force generate RTL Document
  *
  */
 
@@ -42,6 +42,147 @@ const { saveAs } = require("file-saver");
  * @returns {string}
  *
  */
+
+const DEFAULTS = {
+  cover: {},
+  showContents: true,
+  contents: "Chapters",
+  language: "en",
+  id: 1,
+  CSS: `
+body {
+  line-height: 1.5;
+  text-align: left;
+  font-kerning: normal;
+  font-variant: common-ligatures oldstyle-nums proportional-nums;
+  font-feature-settings: "kern", "liga", "clig", "onum", "pnum";
+}
+
+body * {
+    line-height: inherit;
+}
+
+h1, h2, h3 {
+    font-family: sans-serif;
+    text-align: center;
+    font-variant: common-ligatures lining-nums proportional-nums;
+    font-feature-settings: "kern", "liga", "clig", "lnum", "pnum";
+}
+
+code {
+    font-family: monospace;
+    font-variant: no-common-ligatures lining-nums;
+    font-feature-settings: "kern" 0, "liga" 0, "clig" 0, "lnum";
+    white-space: pre-wrap;
+}
+
+pre {
+    margin: 1em 0.5em;
+    border: 1px solid #aaa;
+    box-shadow: 5px 5px 8px #ccc;
+    padding: 0.5em;
+}
+
+h1, h2, h3, code {
+    line-height: 1.2;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    -epub-hyphens: none;
+    adobe-hyphenate: none;
+    hyphens: none;
+}
+
+p, blockquote {
+    font-family: serif;
+    -webkit-hyphenate-limit-before: 3;
+    -webkit-hyphenate-limit-after: 2;
+    -webkit-hyphenate-limit-lines: 2;
+    -ms-hyphenate-limit-chars: 6 3 2;
+    hyphenate-limit-chars: 6 3 2;
+    hyphenate-limit-lines: 2;
+}
+
+blockquote {
+    font-style: italic;
+    margin-left: 3em;
+    text-indent: -1.2ch;
+}
+
+blockquote:before {
+    content: "\\201C\\00A0";
+}
+
+blockquote:after {
+    content: "\\00A0\\201D";
+}
+
+p {
+    margin: 0;
+    padding: 0;
+    text-indent: 1.25em;
+    text-align: justify;
+    widows: 2;
+    orphans: 2;
+}
+
+a, a:link, a:visited {
+    color: inherit;
+    -webkit-text-fill-color: inherit;
+    text-decoration: underline dotted #888;
+}
+
+a:active, a:hover {
+    color: blue;
+    text-decoration: underline solid blue;
+}
+
+.epub-author {
+    color: #555;
+}
+
+.epub-link {
+    margin-bottom: 30px;
+}
+
+.epub-link a {
+    color: #666;
+    font-size: 90%;
+}
+
+.toc-author {
+    font-size: 90%;
+    color: #555;
+}
+
+.toc-link {
+    color: #999;
+    font-size: 85%;
+    display: block;
+}
+
+hr {
+    width: 100%;
+    height: 1em;
+    border: 0;
+    margin: 1.5em auto;
+    text-align: center;
+    color: black;
+    overflow: hidden;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+hr:before {
+    content: '* * *';
+}
+  `,
+};
+
+const RESERVED = {
+  filesForTOC: [],
+  sections: [],
+};
 
 /**
  * @module NodepubLite class
@@ -87,31 +228,19 @@ class NodepubLite {
    * };
    *
    * const instance = new NodepubLite(metadata, makeContentsPage)
-   * @param {MetaData} metadata
+   * @param {MetaData} options
    * @param {ContentPageGenerator} [generateContentsCallback] - a function which is called when the contents
    * page is being constructed.
    */
-  constructor(metadata, generateContentsCallback) {
-    this.CSS = "";
-    this.sections = [];
-    this.images = [];
-    this.metadata = {
-      language: "en",
-      ...metadata,
-    };
-    this.generateContentsCallback = generateContentsCallback;
-    this.showContents = true;
-    this.filesForTOC = [];
-    this.coverImage = {};
-
-    // Basic validation.
-    const required = ["id", "title", "author", "cover"];
-    if (metadata == null) throw new Error("Missing metadata");
+  constructor(options = {}, generateContentsCallback) {
+    const parsedOptions = { ...DEFAULTS, ...options, ...RESERVED };
+    const required = ["title", "author", "cover"];
     required.forEach((field) => {
-      const prop = metadata[field];
+      const prop = parsedOptions[field];
       if (field === "cover") {
         if (prop == null || typeof prop === "undefined" || !prop.data)
           throw new Error(`Missing metadata: cover image`);
+
         this.coverImage = {
           name: `cover${utils.getExtension(utils.getMimeType(prop.data))}`,
           ...prop,
@@ -125,11 +254,8 @@ class NodepubLite {
         throw new Error(`Missing metadata: ${field}`);
     });
 
-    if (
-      metadata.showContents !== null &&
-      typeof metadata.showContents !== "undefined"
-    ) {
-      this.showContents = metadata.showContents;
+    for (const key in parsedOptions) {
+      this[key] = parsedOptions[key];
     }
   }
 
@@ -141,17 +267,18 @@ class NodepubLite {
    * by default the filenames are auto-numbered. No extention should be given.
    * @param {string} title - Table of contents entry
    * @param {string} content  - HTML content of the section
-   * @param {boolean} [excludeFromContents] - Hide from contents/navigation
-   * @param {boolean} [isFrontMatter] - Places before any contents page
-   * @param {string} [overrideFilename] - Section filename inside the EPUB
+   * @param {object} [options] - section modifiers
+   * @param {boolean} [options.excludeFromContents] - Hide from contents/navigation
+   * @param {boolean} [options.isFrontMatter] - Places before any contents page
+   * @param {string} [options.overrideFilename] - Section filename inside the EPUB
    */
-  addSection(
-    title,
-    content,
-    excludeFromContents,
-    isFrontMatter,
-    overrideFilename
-  ) {
+  addSection(title, content, options = {}) {
+    const {
+      excludeFromContents = false,
+      isFrontMatter = false,
+      overrideFilename = undefined,
+    } = options;
+
     let filename = overrideFilename;
     if (
       filename == null ||
@@ -161,14 +288,24 @@ class NodepubLite {
       const i = this.sections.length + 1;
       filename = `s${i}`;
     }
-    filename = `${filename}.xhtml`;
+
+    if (
+      this.sections.find(
+        ({ filename: check }) => check === `${filename.trim()}.xhtml`
+      )
+    )
+      throw new Error("A section already exist with the same filename");
+
+    filename = `${filename.trim()}.xhtml`;
+
     this.sections.push({
       title,
       content,
-      excludeFromContents: excludeFromContents || false,
-      isFrontMatter: isFrontMatter || false,
+      excludeFromContents,
+      isFrontMatter,
       filename,
     });
+    return true;
   }
 
   /**
@@ -210,31 +347,31 @@ class NodepubLite {
       name: "mimetype",
       folder: "",
       options: compressionOptions.STORE,
-      content: structuralFiles.getMimetype(),
+      content: constituents.getMimetype(),
     });
     syncFiles.push({
       name: "container.xml",
       folder: "META-INF",
       options: compressionOptions.COMPRESS,
-      content: structuralFiles.getContainer(this),
+      content: constituents.getContainer(this),
     });
     syncFiles.push({
       name: "ebook.opf",
       folder: "OEBPF",
       options: compressionOptions.COMPRESS,
-      content: structuralFiles.getOPF(this),
+      content: constituents.getOPF(this),
     });
     syncFiles.push({
       name: "navigation.ncx",
       folder: "OEBPF",
       options: compressionOptions.COMPRESS,
-      content: structuralFiles.getNCX(this),
+      content: constituents.getNCX(this),
     });
     syncFiles.push({
       name: "cover.xhtml",
       folder: "OEBPF",
       options: compressionOptions.COMPRESS,
-      content: markupFiles.getCover(this),
+      content: constituents.getCover(this),
     });
 
     // Optional files.
@@ -242,7 +379,7 @@ class NodepubLite {
       name: "ebook.css",
       folder: "OEBPF/css",
       options: compressionOptions.COMPRESS,
-      content: markupFiles.getCSS(this),
+      content: constituents.getCSS(this),
     });
     for (let i = 1; i <= this.sections.length; i += 1) {
       const fname = this.sections[i - 1].filename;
@@ -250,7 +387,7 @@ class NodepubLite {
         name: `${fname}`,
         folder: "OEBPF/content",
         options: compressionOptions.COMPRESS,
-        content: markupFiles.getSection(this, i),
+        content: constituents.getSection(this, i),
       });
     }
 
@@ -260,21 +397,23 @@ class NodepubLite {
         name: "toc.xhtml",
         folder: "OEBPF/content",
         options: compressionOptions.COMPRESS,
-        content: markupFiles.getTOC(this),
+        content: constituents.getTOC(this),
       });
     }
 
     // Extra images - add filename into content property and prepare for async handling.
-    if (this.coverImage)
+    if (this.cover)
       syncFiles.push({
-        name: this.coverImage.name,
+        name: this.cover.name,
         folder: "OEBPF/images",
         options: compressionOptions.COMPRESS,
-        content: this.coverImage.data,
+        content: this.cover.data,
       });
 
-    if (this.metadata.images) {
-      this.metadata.images.forEach((image) => {
+    if (this.images && Array.isArray(this.images)) {
+      console.log(this.images);
+      this.images.forEach((image) => {
+        console.log(image);
         syncFiles.push({
           name: image.name,
           folder: "OEBPF/images",
@@ -299,7 +438,7 @@ class NodepubLite {
    */
   async createEPUB(fileNameWithoutExtension) {
     const files = await this.getFilesForEPUB();
-    const title = this.metadata.title;
+    const title = this.title;
 
     // Start creating the zip.
     const archive = new JSZip();
@@ -317,7 +456,7 @@ class NodepubLite {
     });
 
     return archive
-      .generateAsync({ type: "blob", mimeType: structuralFiles.getMimetype() })
+      .generateAsync({ type: "blob", mimeType: constituents.getMimetype() })
       .then(function (blob) {
         return saveAs(blob, `${fileNameWithoutExtension || title}.epub`);
       });
