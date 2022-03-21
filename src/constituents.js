@@ -104,7 +104,7 @@ const constituents = {
     navMap += `        <content src='cover.xhtml'/>[[EOL]]`;
     navMap += `    </navPoint>[[EOL]]`;
 
-    for (i = 1; i <= document.sections.length; i += 1) {
+    for (let i = 1; i <= document.sections.length; i += 1) {
       if (!document.sections[i - 1].excludeFromContents) {
         if (document.sections[i - 1].isFrontMatter) {
           const fname = document.sections[i - 1].filename;
@@ -137,7 +137,7 @@ const constituents = {
       navMap += `    </navPoint>[[EOL]]`;
     }
 
-    for (i = 1; i <= document.sections.length; i += 1) {
+    for (let i = 1; i <= document.sections.length; i += 1) {
       if (!document.sections[i - 1].excludeFromContents) {
         if (!document.sections[i - 1].isFrontMatter) {
           const fname = document.sections[i - 1].filename;
@@ -221,7 +221,7 @@ const constituents = {
     }
     if (document.tags) {
       const tags = document.tags.split(",");
-      for (i = 0; i < tags.length; i += 1) {
+      for (let i = 0; i < tags.length; i += 1) {
         metadata += `    <dc:subject>${tags[i]}</dc:subject>[[EOL]]`;
       }
     }
@@ -243,13 +243,13 @@ const constituents = {
     }
     manifest += `    <item id="css" href="css/ebook.css" media-type="text/css" />[[EOL]]`;
     // Sections
-    for (i = 1; i <= document.sections.length; i += 1) {
+    for (let i = 1; i <= document.sections.length; i += 1) {
       const { filename } = document.sections[i - 1];
       manifest += `    <item id='s${i}' media-type='application/xhtml+xml' href='content/${filename}'/>[[EOL]]`;
     }
 
     if (document.images && document.images.length) {
-      for (i = 0; i < document.images.length; i += 1) {
+      for (let i = 0; i < document.images.length; i += 1) {
         const image = document.images[i];
         const imageFile = image.name;
         const imageType = getMimeType(image.data) || "";
@@ -265,7 +265,7 @@ const constituents = {
     spine += `<spine toc="ncx" page-progression-direction='${progressionDirection}'>[[EOL]]`;
     spine += "    <itemref idref='cover' linear='yes' />[[EOL]]";
     // Sections
-    for (i = 1; i <= document.sections.length; i += 1) {
+    for (let i = 1; i <= document.sections.length; i += 1) {
       if (document.sections[i - 1].isFrontMatter) {
         spine += `    <itemref idref='s${i}' />[[EOL]]`;
       }
@@ -275,7 +275,7 @@ const constituents = {
       spine += "    <itemref idref='toc'/>[[EOL]]";
     }
 
-    for (i = 1; i <= document.sections.length; i += 1) {
+    for (let i = 1; i <= document.sections.length; i += 1) {
       if (!document.sections[i - 1].isFrontMatter) {
         spine += `    <itemref idref='s${i}' />[[EOL]]`;
       }
